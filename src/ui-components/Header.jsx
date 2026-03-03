@@ -50,7 +50,7 @@ useEffect(()=>{
     <header className="flex justify-center items-center outline-[#A445ED]">
         <div className="flex w-full justify-between items-center max-w-[735px] p-[24px]">
         <a href="/" className="outline-[#A445ED]">
-            <img src="/assets/imgs/logo.svg" className="h-[32px] w-[28px]"/>
+            <img src="/imgs/logo.svg" className="h-[32px] w-[28px]"/>
         </a>
         <div className="flex items-center justify-center">
         <Select defaultValue={currentFont} onValueChange={(value)=>{
@@ -81,8 +81,8 @@ useEffect(()=>{
                 }
             }}  
             />
-            {!isDark&&<img src="/assets/imgs/moon.svg" className="h-[20px] w-[20px] cursor-pointer"/>}
-            {isDark&&<img src="/assets/imgs/moon-dark.svg" className="h-[20px] w-[20px] cursor-pointer"/>}
+            {!isDark&&<img src="/imgs/moon.svg" className="h-[20px] w-[20px] cursor-pointer"/>}
+            {isDark&&<img src="/imgs/moon-dark.svg" className="h-[20px] w-[20px] cursor-pointer"/>}
         </label>
         </div>
         </div>
