@@ -19,9 +19,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
-import { ExternalLink, Loader, PlayIcon, Search , SpeechIcon } from "lucide-react"
-import React, { useEffect, useState } from "react"
+import { ExternalLink, Loader, PauseIcon, PlayIcon, Search , SpeechIcon } from "lucide-react"
+import React, { useEffect, useState , useRef} from "react"
 import { useSearchParams } from "react-router-dom"
+
 
 function Home() {
 
@@ -32,6 +33,12 @@ function Home() {
 
   const [loading,setLoading] = useState(false);
 
+  const [emptyInputInfo, setEmptyInputInfo] = useState(false); 
+
+  const [ audioPlayingIndex, setAudioPlayingIndex] = useState(null);
+  const audioRef = useRef(null);
+    
+
   useEffect(()=>{
     setLoading(true);
     if(urlParams.get("sq")?.trim()==undefined) {
@@ -40,7 +47,7 @@ function Home() {
             sq: ""
         })
     }
-    fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${urlParams.get("sq")?.trim()}`)
+    if(urlParams.get("sq")?.trim()!=""){fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${urlParams.get("sq")?.trim()}`)
     .then(r=>r.json()).then(r=>{
         if(Array.isArray(r)) {
             setApiData(r[0]);
@@ -63,7 +70,7 @@ function Home() {
             message: "Sorry pal, we couldn't find definitions for the word you were looking for.",
         })
         }
-    )
+    )}
     if(urlParams.get("sq")?.trim()=="") {
         setLoading(false)
     }
@@ -75,7 +82,10 @@ function Home() {
     <main className="p-[24px] pt-0 max-w-[735px] mx-auto"> 
     <form onSubmit={(e)=>{
       e.preventDefault();
-      if(searchValue?.current?.value?.trim()!="") {
+      let formData = new FormData(e.target);
+      if(formData.get("search")!="") {
+        setEmptyInputInfo(false);
+        if(searchValue?.current?.value?.trim()!="") {
         setUrlParams({
             ...urlParams,
             sq: searchValue?.current?.value?.trim().toLowerCase()
@@ -86,15 +96,24 @@ function Home() {
             sq: ""
         })
       }
-    }}> 
-      <InputGroup className={'bg-[#f4f4f4] border-0 rounded-[16px] border-1'}>
-      <InputGroupInput className={'border-none outline-none focus-visible:outline-[#A445ED]'} placeholder="Search..."  ref={searchValue} defaultValue={urlParams.get("sq")?.trim()} />
+      } else {
+        searchValue.current.focus();
+        setEmptyInputInfo(true);
+      }
+    }} className="flex flex-col gap-2 "> 
+      <InputGroup className={`bg-[#f4f4f4] border-0 rounded-[16px] border-1 ${emptyInputInfo?'!ring-[red]':'!ring-[#A445ED]'}`}>
+      <InputGroupInput className={'border-none outline-none'} placeholder="Type a word..."  ref={searchValue} defaultValue={urlParams.get("sq")?.trim()} name="search" onChange={(e)=>{
+        if(e.target.value) {
+            setEmptyInputInfo(false);   
+        }
+      }} />
       <InputGroupAddon align="inline-end" className={'h-full p-0'}>
         <Button className={'!items-center p-0 w-[50px] h-full cursor-pointer w-[45 px] !px-0 mr-[9px] rounded-full'} type='submit' variant="ghost"> 
           <Search className="text-[#A445ED]"/>
         </Button>
       </InputGroupAddon>
       </InputGroup>
+      {emptyInputInfo&&<span className="text-red-500 ml-2">Whoops, can’t be empty…</span>}
     </form>
     {
     loading&&
@@ -152,16 +171,22 @@ function Home() {
                         apiData?.phonetics?.length>0 ?
                         <>
                         {apiData?.phonetics?.filter(el=>el.audio).map((el,inx)=>{
-                            return <div className="flex w-full justify-between items-center border-1 py-4 px-4 rounded-[12px]" key={inx}>
-                            <span className="text-[16px]">{el.text??"/'no-data/"}</span>
-                            <button className="cursor-pointer hover:text-[#A445ED] px-1">
-                                <PlayIcon className="w-[20px]" onClick={()=>{
-                                    let audio = new Audio();
-                                    audio.src=el.audio;
-                                    audio.play();
-                                }}/>
+                            return (
+                            <div className="flex justify-between w-full">
+                            <span>{el.text??"/'no-data/"}</span>
+                            <button className="flex items-center justify-center hover:text-[#a445ed] cursor-pointer"
+                            onClick={()=>{
+                                audioRef.current = new Audio(el.audio);
+                                audioRef.current.play();
+                                setAudioPlayingIndex(null);
+                                audioRef.current.addEventListener("playing",()=>setAudioPlayingIndex(inx));
+                                audioRef.current.addEventListener("ended",()=>setAudioPlayingIndex(null));
+                            }}>
+                            {(audioPlayingIndex===inx) ?
+                            <PauseIcon/>:
+                            <PlayIcon/>}
                             </button>
-                            </div>
+                            </div>);
                         })}
                         </>
                         : "No phonetics"
@@ -192,7 +217,14 @@ function Home() {
                     </ul>
                     <div className="flex flex-wrap">
                     <span className="text-[16px] opacity-85 ">Synonyms: &nbsp;</span>
-                    <div className="gap-x-2 flex flex-wrap text-[#A445ED] font-bold">{el.synonyms?.join(", ")}</div>
+                    <div className="gap-x-2 flex flex-wrap text-[#A445ED] font-bold">
+                        {el.synonyms?.map((el,inx)=>(<button key={inx} className="hover:opacity-85 cursor-pointer" onClick={(e)=>{
+                            setUrlParams({
+                                ...urlParams,
+                                sq: e.target.textContent
+                            })
+                        }}>{el}</button>))}
+                    </div>
                     </div>
                 </div>
             </div>
@@ -207,7 +239,7 @@ function Home() {
     <hr className="my-3"/>
     <div className="flex flex-wrap gap-2">
     <span className="text-[14px] opacity-75 underline sm:text-[18px]">Sources:</span>
-    <div className="gap-2 flex flex-wrap">{apiData?.sourceUrls?.map((el,inx)=>(<a href={el} key={inx} target="_blank" className="underline hover:text-[#a445ed] flex gap-1.5 leading-none items-center justify-center">{el} <ExternalLink className="w-5"/></a>))}</div>
+    <div className="gap-2 flex flex-wrap">{apiData?.sourceUrls?.map((el,inx)=>(<a href={el} key={inx} target="_blank" className="underline hover:text-[#a445ed] flex gap-1.5 leading-none items-center justify-center break-all">{el} <ExternalLink className="w-5"/></a>))}</div>
     </div>
     </>
     }
