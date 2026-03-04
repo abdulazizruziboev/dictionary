@@ -41,6 +41,7 @@ function Home() {
 
   useEffect(()=>{
     setLoading(true);
+    searchValue.current.value=urlParams.get("sq")?.trim();
     if(urlParams.get("sq")?.trim()==undefined) {
         setUrlParams({
             ...urlParams,
@@ -101,15 +102,15 @@ function Home() {
         setEmptyInputInfo(true);
       }
     }} className="flex flex-col gap-2 "> 
-      <InputGroup className={`bg-[#f4f4f4] border-0 rounded-[16px] border-1 ${emptyInputInfo?'!ring-[red]':'!ring-[#A445ED]'}`}>
-      <InputGroupInput className={'border-none outline-none'} placeholder="Type a word..."  ref={searchValue} defaultValue={urlParams.get("sq")?.trim()} name="search" onChange={(e)=>{
+      <InputGroup className={`bg-[#f4f4f4] border-0 rounded-[16px] md:h-[45px]  border-1 ${emptyInputInfo?'!ring-[red]':'!ring-[#A445ED]'}`}>
+      <InputGroupInput className={'border-none outline-none md:text-[18px]'} placeholder="Type a word..."  ref={searchValue} name="search" onChange={(e)=>{
         if(e.target.value) {
             setEmptyInputInfo(false);   
         }
       }} />
       <InputGroupAddon align="inline-end" className={'h-full p-0'}>
-        <Button className={'!items-center p-0 w-[50px] h-full cursor-pointer w-[45 px] !px-0 mr-[9px] rounded-full'} type='submit' variant="ghost"> 
-          <Search className="text-[#A445ED]"/>
+        <Button className={'!items-center p-0 w-[50px] h-full cursor-pointer w-[45px] !px-0 mr-[9px] rounded-full'} type='submit' variant="ghost"> 
+          <Search className="text-[#A445ED] md:scale-125"/>
         </Button>
       </InputGroupAddon>
       </InputGroup>
@@ -239,7 +240,7 @@ function Home() {
     <hr className="my-3"/>
     <div className="flex flex-wrap gap-2">
     <span className="text-[14px] opacity-75 underline sm:text-[18px]">Sources:</span>
-    <div className="gap-2 flex flex-wrap">{apiData?.sourceUrls?.map((el,inx)=>(<a href={el} key={inx} target="_blank" className="underline hover:text-[#a445ed] flex gap-1.5 leading-none items-center justify-center break-all">{el} <ExternalLink className="w-5"/></a>))}</div>
+    <div className="gap-2 flex flex-wrap">{apiData?.sourceUrls?.map((el,inx)=>(<a href={el} key={inx} target="_blank" className="underline hover:text-[#a445ed] flex gap-1.5 leading-none items-center justify-center break-all">{decodeURIComponent(el)} <ExternalLink className="w-5"/></a>))}</div>
     </div>
     </>
     }
