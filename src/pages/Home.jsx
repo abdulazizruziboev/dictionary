@@ -168,7 +168,7 @@ function Home() {
                 </AlertDialogHeader>
                     <AlertDialogDescription className={'w-full px-1 grid gap-2'}>
                     {
-                        apiData?.phonetics?.length>0 ?
+                        apiData?.phonetics?.filter(el=>el.audio)?.length>0 ?
                         <>
                         {apiData?.phonetics?.filter(el=>el.audio).map((el,inx)=>{
                             return (
