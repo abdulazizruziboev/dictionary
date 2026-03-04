@@ -207,7 +207,7 @@ function Home() {
     <hr className="my-3"/>
     <div className="flex flex-wrap gap-2">
     <span className="text-[14px] opacity-75 underline sm:text-[18px]">Sources:</span>
-    <div className="gap-2 flex">{apiData?.sourceUrls?.map((el,inx)=>(<a href={el} key={inx} target="_blank" className="underline hover:text-[#a445ed] flex gap-1.5 leading-none items-center justify-center">{el} <ExternalLink className="w-5"/></a>))}</div>
+    <div className="gap-2 flex flex-wrap">{apiData?.sourceUrls?.map((el,inx)=>(<a href={el} key={inx} target="_blank" className="underline hover:text-[#a445ed] flex gap-1.5 leading-none items-center justify-center">{el} <ExternalLink className="w-5"/></a>))}</div>
     </div>
     </>
     }
