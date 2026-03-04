@@ -218,12 +218,12 @@ function Home() {
                     <div className="flex flex-wrap">
                     <span className="text-[16px] opacity-85 ">Synonyms: &nbsp;</span>
                     <div className="gap-x-2 flex flex-wrap text-[#A445ED] font-bold">
-                        {el.synonyms?.map((el,inx)=>(<button key={inx} className="hover:opacity-85 cursor-pointer" onClick={(e)=>{
+                        {el.synonyms.length>0?el.synonyms?.map((el,inx)=>(<button key={inx} className="hover:opacity-85 cursor-pointer" onClick={(e)=>{
                             setUrlParams({
                                 ...urlParams,
                                 sq: e.target.textContent
-                            })
-                        }}>{el}</button>))}
+                        })
+                        }}>{el}</button>)):"No synonyms"}
                     </div>
                     </div>
                 </div>
